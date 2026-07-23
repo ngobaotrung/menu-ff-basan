@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FF MENU BA SAN</title>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial;
+}
+
+body{
+background:#050505;
+overflow:hidden;
+color:white;
+}
+
+canvas{
+position:fixed;
+left:0;
+top:0;
+z-index:-1;
+}
+
+.menu{
+width:350px;
+max-width:90%;
+margin:40px auto;
+background:rgba(20,0,0,.85);
+border:2px solid red;
+border-radius:15px;
+padding:20px;
+box-shadow:0 0 25px red;
+}
+
+h2{
+text-align:center;
+color:#ff3b3b;
+margin-bottom:20px;
+}
+
+.item{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:10px;
+margin:8px 0;
+background:#111;
+border-radius:10px;
+}
+
+.switch{
+position:relative;
+width:55px;
+height:28px;
+}
+
+.switch input{
+display:none;
+}
+
+.slider{
+position:absolute;
+cursor:pointer;
+top:0;
+left:0;
+right:0;
+bottom:0;
+background:#555;
+border-radius:30px;
+transition:.3s;
+}
+
+.slider:before{
+content:"";
+position:absolute;
+width:22px;
+height:22px;
+left:3px;
+top:3px;
+background:white;
+border-radius:50%;
+transition:.3s;
+}
+
+input:checked + .slider{
+background:red;
+}
+
+input:checked + .slider:before{
+transform:translateX(27px);
+}
+
+button{
+width:100%;
+margin-top:10px;
+padding:12px;
+border:none;
+border-radius:10px;
+background:red;
+color:white;
+font-size:16px;
+cursor:pointer;
+}
+
+button:hover{
+background:#ff5555;
+}
+
+#toast{
+position:fixed;
+bottom:30px;
+left:50%;
+transform:translateX(-50%);
+background:#111;
+border:2px solid red;
+padding:12px 20px;
+border-radius:8px;
+display:none;
+}
+</style>
+
+</head>
+
+<body>
+
+<canvas id="bg"></canvas>
+
+<div class="menu">
+
+<h2>FF MENU BA SAN</h2>
+
+<div id="list"></div>
+
+<button onclick="openFF()">MỞ FREE FIRE</button>
+
+<button onclick="openMAX()">MỞ FREE FIRE MAX</button>
+
+</div>
+
+<div id="toast"></div>
+
+<script>
+
+const names=[
+"Lock",
+"Drag",
+"Neck",
+"Fix Lố",
+"Fix Rung",
+"Fix Lag",
+"Nhẹ Tâm",
+"Nhạy",
+"Boots",
+"Đầm Tâm",
+"Bám Cổ"
+];
+
+const list=document.getElementById("list");
+
+names.forEach(n=>{
+
+list.innerHTML+=`
+<div class="item">
+
+<span>${n}</span>
+
+<label class="switch">
+
+<input type="checkbox"
+onchange="notify('${n}',this.checked)">
+
+<span class="slider"></span>
+
+</label>
+
+</div>`;
+
+});
+
+function notify(name,state){
+
+const t=document.getElementById("toast");
+
+t.style.display="block";
+
+t.innerHTML=
+(state?"✅ ":"❌ ")+name+
+(state?" ON":" OFF");
+
+setTimeout(()=>{
+
+t.style.display="none";
+
+},1500);
+
+}
+
+function openFF(){
+    window.location.href = "freefire://";
+}
+
+function openFFMAX(){
+    window.location.href = "freefiremax://";
+}
+
+
+const canvas=document.getElementById("bg");
+const ctx=canvas.getContext("2d");
+
+resize();
+
+window.onresize=resize;
+
+function resize(){
+
+canvas.width=innerWidth;
+canvas.height=innerHeight;
+
+}
+
+let dots=[];
+
+for(let i=0;i<70;i++){
+
+dots.push({
+
+x:Math.random()*canvas.width,
+
+y:Math.random()*canvas.height,
+
+vx:(Math.random()-0.5),
+
+vy:(Math.random()-0.5)
+
+});
+
+}
+
+function draw(){
+
+ctx.clearRect(0,0,canvas.width,canvas.height);
+
+for(let a of dots){
+
+a.x+=a.vx;
+
+a.y+=a.vy;
+
+if(a.x<0||a.x>canvas.width)a.vx*=-1;
+
+if(a.y<0||a.y>canvas.height)a.vy*=-1;
+
+ctx.fillStyle="red";
+
+ctx.beginPath();
+
+ctx.arc(a.x,a.y,2,0,6.28);
+
+ctx.fill();
+
+for(let b of dots){
+
+let dx=a.x-b.x;
+
+let dy=a.y-b.y;
+
+let d=Math.sqrt(dx*dx+dy*dy);
+
+if(d<120){
+
+ctx.strokeStyle="rgba(255,0,0,"+(1-d/120)+")";
+
+ctx.beginPath();
+
+ctx.moveTo(a.x,a.y);
+
+ctx.lineTo(b.x,b.y);
+
+ctx.stroke();
+
+}
+
+}
+
+}
+
+requestAnimationFrame(draw);
+
+}
+
+draw();
+
+</script>
+
+</body>
+</html>
